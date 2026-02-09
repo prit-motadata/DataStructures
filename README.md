@@ -42,9 +42,9 @@ src/
  ├── main/java/org/motadata/...
  │    ├── Main.java
  │    ├── datastructures/           # Datastructure implementation
- │    └── exercises/array/          # Exercise implementation
+ │    └── exercises/                # Exercise implementation
  └── test/java/org/motadata/...
-      └── exercises/array/          # Test implementation
+      └── exercises/                # Test implementation
 ```
 
 Other files:

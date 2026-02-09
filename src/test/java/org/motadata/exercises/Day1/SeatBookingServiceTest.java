@@ -1,4 +1,4 @@
-package org.motadata.exercises.array;
+package org.motadata.exercises.Day1;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
