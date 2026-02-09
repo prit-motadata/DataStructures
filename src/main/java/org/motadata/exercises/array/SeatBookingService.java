@@ -2,6 +2,9 @@ package org.motadata.exercises.array;
 
 import org.motadata.datastructures.array.ArrayFixedSize;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class SeatBookingService {
 
     private static final int EMPTY = 0;
@@ -45,17 +48,15 @@ public class SeatBookingService {
         return seats.get(index) == EMPTY;
     }
 
-    // Display all available seats
-    public void displayAvailableSeats() {
-        System.out.println("Available seats:");
-
+    // Get available seats
+    public List<Integer> getAvailableSeats() {
+        List<Integer> result = new ArrayList<>();
         for (int i = 0; i < seats.size(); i++) {
             if (seats.get(i) == EMPTY) {
-                System.out.print((i + 1) + " ");
+                result.add(i + 1);
             }
         }
-
-        System.out.println();
+        return result;
     }
 
     // Cancel a booking

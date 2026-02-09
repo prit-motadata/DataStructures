@@ -3,6 +3,8 @@ package org.motadata.exercises.array;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import java.util.List;
+
 import static org.junit.jupiter.api.Assertions.*;
 
 class SeatBookingServiceTest {
@@ -71,5 +73,44 @@ class SeatBookingServiceTest {
         seatBookingService.bookSeat(5);
 
         assertFalse(seatBookingService.isSeatAvailable(5));
+    }
+
+    @Test
+    void shouldThrowExceptionForInvalidSeatNumberInIsSeatAvailable() {
+        assertThrows(
+                IllegalArgumentException.class,
+                () -> seatBookingService.isSeatAvailable(0)
+        );
+    }
+
+    @Test
+    void shouldThrowExceptionForInvalidSeatNumberInCancelSeat() {
+        assertThrows(
+                IllegalArgumentException.class,
+                () -> seatBookingService.cancelSeat(400)
+        );
+    }
+
+    @Test
+    void shouldReturnAvailableSeatsCorrectly() {
+        seatBookingService.bookSeat(1);
+        seatBookingService.bookSeat(300);
+
+        List<Integer> availableSeats = seatBookingService.getAvailableSeats();
+
+        assertFalse(availableSeats.contains(1));
+        assertFalse(availableSeats.contains(300));
+        assertTrue(availableSeats.contains(2));
+        assertEquals(298, availableSeats.size());
+    }
+
+
+    @Test
+    void shouldHandleBoundarySeats() {
+        assertTrue(seatBookingService.bookSeat(1));
+        assertTrue(seatBookingService.bookSeat(300));
+
+        assertFalse(seatBookingService.isSeatAvailable(1));
+        assertFalse(seatBookingService.isSeatAvailable(300));
     }
 }
