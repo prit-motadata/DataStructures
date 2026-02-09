@@ -3,12 +3,18 @@ package org.motadata.datastructures.linkedlist;
 public class SinglyLinkedList<T> {
 
     private Node<T> head;
+    private Node<T> tail;
 
     // Add at beginning
     public void addFirst(T data) {
         Node<T> newNode = new Node<>(data);
-        newNode.next = head;
-        head = newNode;
+
+        if (head == null) {
+            head = tail = newNode;
+        } else {
+            newNode.next = head;
+            head = newNode;
+        }
     }
 
     // Add at end
@@ -16,15 +22,12 @@ public class SinglyLinkedList<T> {
         Node<T> newNode = new Node<>(data);
 
         if (head == null) {
-            head = newNode;
+            head = tail = newNode;
             return;
         }
 
-        Node<T> current = head;
-        while (current.next != null) {
-            current = current.next;
-        }
-        current.next = newNode;
+        tail.next = newNode;
+        tail = newNode;
     }
 
     // Remove element
@@ -33,15 +36,39 @@ public class SinglyLinkedList<T> {
             return false;
         }
 
+        // Remove head
         if (head.data.equals(data)) {
             head = head.next;
+
+            // If list becomes empty
+            if (head == null) {
+                tail = null;
+            }
             return true;
         }
 
         Node<T> current = head;
         while (current.next != null) {
             if (current.next.data.equals(data)) {
+
+                // If removing tail
+                if (current.next == tail) {
+                    tail = current;
+                }
+
                 current.next = current.next.next;
+                return true;
+            }
+            current = current.next;
+        }
+        return false;
+    }
+
+    // Search Element
+    public boolean contains(T data) {
+        Node<T> current = head;
+        while (current != null) {
+            if (current.data.equals(data)) {
                 return true;
             }
             current = current.next;
