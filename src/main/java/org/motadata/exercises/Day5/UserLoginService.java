@@ -1,6 +1,5 @@
 package org.motadata.exercises.Day5;
 
-import org.motadata.datastructures.hashmap.GenericBucketHashMap;
 import org.motadata.datastructures.hashmap.Map;
 
 import java.util.Set;
@@ -10,7 +9,11 @@ public class UserLoginService {
     private final Map<String, String> users;
 
     public UserLoginService() {
-        this.users = new GenericBucketHashMap<>();
+        this.users = MapFactory.createDefault();
+    }
+
+    public UserLoginService(MapType mapType) {
+        this.users = MapFactory.createMap(mapType);
     }
 
     // Add new user
