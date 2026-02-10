@@ -26,6 +26,11 @@ public class ArrayDynamic<T> {
         buffer[size++] = element;
     }
 
+    public void set(int index, T value) {
+        checkIndex(index);
+        buffer[index] = value;
+    }
+
     private boolean shouldResize() {
         return size >= buffer.length * loadFactor;
     }
