@@ -3,6 +3,8 @@ package org.motadata.exercises.Day5;
 import org.motadata.datastructures.hashmap.GenericBucketHashMap;
 import org.motadata.datastructures.hashmap.Map;
 
+import java.util.Set;
+
 public class UserLoginService {
 
     private final Map<String, String> users;
@@ -33,6 +35,19 @@ public class UserLoginService {
 
         String storedPassword = users.get(username);
         return password.equals(storedPassword);
+    }
+
+    // Delete user
+    public boolean deleteUser(String username) {
+        if (username == null) {
+            return false;
+        }
+        return users.delete(username);
+    }
+
+    // Get all registered users
+    public Set<String> getAllUsers() {
+        return users.keySet();
     }
 
     // Get total registered users

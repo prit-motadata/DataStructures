@@ -3,6 +3,8 @@ package org.motadata.exercises.Day5;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import java.util.Set;
+
 import static org.junit.jupiter.api.Assertions.*;
 
 class UserLoginServiceTest {
@@ -93,5 +95,52 @@ class UserLoginServiceTest {
         boolean authenticated = loginService.authenticate("alice", null);
 
         assertFalse(authenticated);
+    }
+
+    // -------- deleteUser --------
+
+    @Test
+    void shouldDeleteExistingUser() {
+        loginService.registerUser("alice", "123");
+
+        boolean deleted = loginService.deleteUser("alice");
+
+        assertTrue(deleted);
+        assertEquals(0, loginService.totalUsers());
+        assertFalse(loginService.authenticate("alice", "123"));
+    }
+
+    @Test
+    void shouldReturnFalseWhenDeletingNonExistingUser() {
+        assertFalse(loginService.deleteUser("unknown"));
+    }
+
+    @Test
+    void shouldReturnFalseWhenDeletingNullUser() {
+        assertFalse(loginService.deleteUser(null));
+    }
+
+    // -------- getAllUsers --------
+
+    @Test
+    void shouldReturnAllRegisteredUsers() {
+        loginService.registerUser("alice", "123");
+        loginService.registerUser("bob", "456");
+        loginService.registerUser("charlie", "789");
+
+        Set<String> users = loginService.getAllUsers();
+
+        assertEquals(3, users.size());
+        assertTrue(users.contains("alice"));
+        assertTrue(users.contains("bob"));
+        assertTrue(users.contains("charlie"));
+    }
+
+    @Test
+    void shouldReturnEmptySetWhenNoUsersRegistered() {
+        Set<String> users = loginService.getAllUsers();
+
+        assertNotNull(users);
+        assertTrue(users.isEmpty());
     }
 }
