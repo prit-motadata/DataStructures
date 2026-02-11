@@ -72,10 +72,19 @@ class ChatServiceTest {
 
     @Test
     void sendAndReceiveMessage_success() {
-        chatService.sendMessage("alice", "bob", "Hello");
+        chatService.register("alice", "123");
+        chatService.register("bob", "456");
+
+        chatService.login("alice", "123");
+
+        boolean sent = chatService.sendMessage("alice", "bob", "Hello");
+        assertTrue(sent);
 
         Message received = chatService.receiveMessage();
         assertNotNull(received);
+        assertEquals("alice", received.from());
+        assertEquals("bob", received.to());
+        assertEquals("Hello", received.content());
     }
 
     @Test
@@ -87,10 +96,15 @@ class ChatServiceTest {
 
     @Test
     void undoLastMessage_success() {
+        chatService.register("alice", "123");
+        chatService.register("bob", "456");
+        chatService.login("alice", "123");
+
         chatService.sendMessage("alice", "bob", "Hi");
 
         Message undone = chatService.undoLastMessage();
         assertNotNull(undone);
+        assertEquals("Hi", undone.content());
     }
 
     @Test
@@ -102,7 +116,13 @@ class ChatServiceTest {
 
     @Test
     void messageAddedToHistoryAfterReceive() {
-        chatService.sendMessage("a", "b", "msg1");
+        chatService.register("a", "1");
+        chatService.register("b", "2");
+        chatService.login("a", "1");
+
+        boolean sent = chatService.sendMessage("a", "b", "msg1");
+        assertTrue(sent);
+
         chatService.receiveMessage();
 
         // Just ensure no exception and history path executed

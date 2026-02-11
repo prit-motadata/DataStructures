@@ -34,6 +34,10 @@ public class ChatService {
     // ---------------- USER MANAGEMENT ----------------
 
     public boolean register(String username, String password) {
+        if (username == null || password == null) {
+            return false;
+        }
+
         if (users.containsKey(username)) {
             return false;
         }
@@ -78,10 +82,20 @@ public class ChatService {
 
     // ---------------- MESSAGING ----------------
 
-    public void sendMessage(String from, String to, String content) {
+    public boolean sendMessage(String from, String to, String content) {
+        if (!users.containsKey(from) || !users.containsKey(to)) {
+            return false;
+        }
+
+        Integer senderIndex = userIndexMap.get(from);
+        if (statuses.get(senderIndex) != UserStatus.ONLINE) {
+            return false;
+        }
+
         Message message = new Message(from, to, content);
         messageQueue.offer(message);
         undoStack.push(message);
+        return true;
     }
 
     public Message receiveMessage() {
@@ -98,7 +112,12 @@ public class ChatService {
         if (undoStack.isEmpty()) {
             return null;
         }
-        return undoStack.pop();
+
+        Message last = undoStack.pop();
+
+        messageQueue.remove(last);
+
+        return last;
     }
 
     // ---------------- DISPLAY ----------------
