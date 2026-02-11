@@ -45,7 +45,7 @@ public class UserLoginService {
         if (username == null) {
             return false;
         }
-        return users.delete(username);
+        return users.remove(username);
     }
 
     // Get all registered users
