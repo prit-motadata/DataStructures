@@ -1,4 +1,4 @@
-package org.motadata.exercises.Day5;
+package org.motadata.common.factory;
 
 import org.motadata.datastructures.hashmap.GenericBucketHashMap;
 import org.motadata.datastructures.hashmap.Map;

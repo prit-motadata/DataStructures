@@ -3,6 +3,7 @@ package org.motadata.exercises.Day5;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.EnumSource;
+import org.motadata.common.factory.MapType;
 
 import java.util.Set;
 

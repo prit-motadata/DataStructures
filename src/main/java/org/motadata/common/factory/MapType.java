@@ -1,4 +1,4 @@
-package org.motadata.exercises.Day5;
+package org.motadata.common.factory;
 
 public enum MapType {
     GENERIC,
