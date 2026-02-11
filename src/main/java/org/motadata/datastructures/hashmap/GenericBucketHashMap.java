@@ -1,5 +1,7 @@
 package org.motadata.datastructures.hashmap;
 
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -57,7 +59,7 @@ public class GenericBucketHashMap<K, V> extends Map<K, V> {
     }
 
     @Override
-    public boolean delete(K key) {
+    public boolean remove(K key) {
         int index = hash(key, buckets.length);
 
         Entry<K, V> current = buckets[index];
@@ -93,6 +95,21 @@ public class GenericBucketHashMap<K, V> extends Map<K, V> {
         }
 
         return keys;
+    }
+
+    @Override
+    public Collection<V> values() {
+        Collection<V> values = new ArrayList<>();
+
+        for (Entry<K, V> bucket : buckets) {
+            Entry<K, V> current = bucket;
+            while (current != null) {
+                values.add(current.value);
+                current = current.next;
+            }
+        }
+
+        return values;
     }
 
     @Override

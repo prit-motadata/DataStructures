@@ -1,5 +1,6 @@
 package org.motadata.datastructures.hashmap;
 
+import java.util.Collection;
 import java.util.Set;
 
 public abstract class Map<K, V> {
@@ -8,9 +9,11 @@ public abstract class Map<K, V> {
 
     public abstract V get(K key);
 
-    public abstract boolean delete(K key);
+    public abstract boolean remove(K key);
 
     public abstract Set<K> keySet();
+
+    public abstract Collection<V> values();
 
     public abstract int size();
 

@@ -1,8 +1,6 @@
 package org.motadata.datastructures.hashmap;
 
-import java.util.HashSet;
-import java.util.Set;
-import java.util.TreeMap;
+import java.util.*;
 
 public class TreeifiedBucketHashMap<K extends Comparable<K>, V> extends Map<K, V> {
 
@@ -43,7 +41,7 @@ public class TreeifiedBucketHashMap<K extends Comparable<K>, V> extends Map<K, V
     }
 
     @Override
-    public boolean delete(K key) {
+    public boolean remove(K key) {
         int index = hash(key, buckets.length);
         if (buckets[index] == null) {
             return false;
@@ -66,6 +64,19 @@ public class TreeifiedBucketHashMap<K extends Comparable<K>, V> extends Map<K, V
             }
         }
         return keys;
+    }
+
+    @Override
+    public Collection<V> values() {
+        Collection<V> values = new ArrayList<>();
+
+        for (Bucket<K, V> bucket : buckets) {
+            if (bucket != null) {
+                values.addAll(bucket.values());
+            }
+        }
+
+        return values;
     }
 
     @Override
@@ -124,7 +135,9 @@ public class TreeifiedBucketHashMap<K extends Comparable<K>, V> extends Map<K, V
 
         boolean remove(K key) {
             if (tree != null) {
-                return tree.remove(key) != null;
+                boolean removed = tree.remove(key) != null;
+                if (removed) count--;
+                return removed;
             }
 
             Entry<K, V> current = head;
@@ -158,6 +171,22 @@ public class TreeifiedBucketHashMap<K extends Comparable<K>, V> extends Map<K, V
                     current = current.next;
                 }
             }
+            return result;
+        }
+
+        Collection<V> values() {
+            Collection<V> result = new ArrayList<>();
+
+            if (tree != null) {
+                result.addAll(tree.values());
+            } else {
+                Entry<K, V> current = head;
+                while (current != null) {
+                    result.add(current.value);
+                    current = current.next;
+                }
+            }
+
             return result;
         }
 
