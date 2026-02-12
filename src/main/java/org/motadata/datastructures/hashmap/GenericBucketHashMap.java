@@ -8,14 +8,17 @@ import java.util.Set;
 public class GenericBucketHashMap<K, V> extends Map<K, V> {
 
     private static final int DEFAULT_CAPACITY = 16;
+    private static final double LOAD_FACTOR = 0.75;
 
-    private final Entry<K, V>[] buckets;
+    private Entry<K, V>[] buckets;
     private int size;
+    private int threshold;
 
     @SuppressWarnings("unchecked")
     public GenericBucketHashMap() {
         buckets = new Entry[DEFAULT_CAPACITY];
         size = 0;
+        threshold = (int) (DEFAULT_CAPACITY * LOAD_FACTOR);
     }
 
     @Override
@@ -34,11 +37,16 @@ public class GenericBucketHashMap<K, V> extends Map<K, V> {
             current = current.next;
         }
 
-        // Insert new entry at head (O(1))
+        // Insert new entry at head
         Entry<K, V> newEntry = new Entry<>(key, value);
         newEntry.next = head;
         buckets[index] = newEntry;
         size++;
+
+        // Resize check
+        if (size >= threshold) {
+            resize();
+        }
 
         return true;
     }
@@ -115,6 +123,33 @@ public class GenericBucketHashMap<K, V> extends Map<K, V> {
     @Override
     public int size() {
         return size;
+    }
+
+    // ================= RESIZE =================
+
+    @SuppressWarnings("unchecked")
+    private void resize() {
+        int newCapacity = buckets.length * 2;
+        Entry<K, V>[] oldBuckets = buckets;
+
+        buckets = new Entry[newCapacity];
+        threshold = (int) (newCapacity * LOAD_FACTOR);
+
+        // Rehash all entries
+        for (Entry<K, V> bucket : oldBuckets) {
+            Entry<K, V> current = bucket;
+            while (current != null) {
+                Entry<K, V> next = current.next;
+
+                int newIndex = hash(current.key, newCapacity);
+
+                // Insert at head in new table
+                current.next = buckets[newIndex];
+                buckets[newIndex] = current;
+
+                current = next;
+            }
+        }
     }
 
     // ===== Entry Node =====
