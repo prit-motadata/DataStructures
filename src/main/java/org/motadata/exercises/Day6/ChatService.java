@@ -23,11 +23,11 @@ public class ChatService {
     // Message history → LinkedList
     private final SinglyLinkedList<Message> messageHistory = new SinglyLinkedList<>();
 
-    // Message queue → Queue
+    // Message queue → Queue (shared across all users)
     private final Queue<Message> messageQueue = new ArrayDeque<>();
 
-    // Undo → Stack
-    private final Deque<Message> undoStack = new ArrayDeque<>();
+    // Per-user undo → Stack
+    private final Map<String, Deque<Message>> userUndoStacks = new GenericBucketHashMap<>();
 
     private int userCount = 0;
 
@@ -45,6 +45,7 @@ public class ChatService {
         users.put(username, password);
         userIndexMap.put(username, userCount);
         statuses.add(UserStatus.OFFLINE);
+        userUndoStacks.put(username, new ArrayDeque<>());
         userCount++;
 
         return true;
@@ -94,22 +95,60 @@ public class ChatService {
 
         Message message = new Message(from, to, content);
         messageQueue.offer(message);
-        undoStack.push(message);
+
+        Deque<Message> undoStack = userUndoStacks.get(from);
+        if (undoStack != null) {
+            undoStack.push(message);
+        }
         return true;
     }
 
-    public Message receiveMessage() {
-        Message msg = messageQueue.poll();
-        if (msg != null) {
-            messageHistory.addLast(msg);
+    /**
+     * Receive the next message for a specific user.
+     * This scales for multiple users by only delivering messages addressed to {@code username}.
+     */
+    public Message receiveMessage(String username) {
+        if (username == null || !users.containsKey(username)) {
+            return null;
         }
-        return msg;
+
+        if (messageQueue.isEmpty()) {
+            return null;
+        }
+
+        int size = messageQueue.size();
+        Message target = null;
+
+        // Rotate through the queue once to find the first message for this user
+        for (int i = 0; i < size; i++) {
+            Message msg = messageQueue.poll();
+            if (target == null && msg.to().equals(username)) {
+                target = msg;
+            } else {
+                messageQueue.offer(msg);
+            }
+        }
+
+        if (target != null) {
+            messageHistory.addLast(target);
+        }
+
+        return target;
     }
 
     // ---------------- UNDO ----------------
 
-    public Message undoLastMessage() {
-        if (undoStack.isEmpty()) {
+    /**
+     * Undo the last message sent by a specific user.
+     * This only affects messages sent by {@code username}, allowing multiple users to undo independently.
+     */
+    public Message undoLastMessage(String username) {
+        if (username == null) {
+            return null;
+        }
+
+        Deque<Message> undoStack = userUndoStacks.get(username);
+        if (undoStack == null || undoStack.isEmpty()) {
             return null;
         }
 
@@ -118,6 +157,30 @@ public class ChatService {
         messageQueue.remove(last);
 
         return last;
+    }
+
+    // ---------------- SEARCH ----------------
+
+    public void searchMessages(String keyword) {
+
+        if (keyword == null || keyword.trim().isEmpty()) {
+            System.out.println("Invalid keyword");
+            return;
+        }
+
+        System.out.println("Search Results for: " + keyword);
+
+        SinglyLinkedList<Message> results =
+                messageHistory.search(msg ->
+                        msg.content().toLowerCase()
+                                .contains(keyword.toLowerCase()));
+
+        if (results.isEmpty()) {
+            System.out.println("No messages found.");
+            return;
+        }
+
+        results.display();
     }
 
     // ---------------- DISPLAY ----------------

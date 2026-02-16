@@ -1,5 +1,7 @@
 package org.motadata.datastructures.linkedlist;
 
+import java.util.function.Predicate;
+
 public class SinglyLinkedList<T> {
 
     private Node<T> head;
@@ -89,6 +91,22 @@ public class SinglyLinkedList<T> {
             current = current.next;
         }
         System.out.println("END");
+    }
+
+    // Search list
+    public SinglyLinkedList<T> search(Predicate<T> condition) {
+        SinglyLinkedList<T> result = new SinglyLinkedList<>();
+
+        Node<T> current = head;
+
+        while (current != null) {
+            if (condition.test(current.data)) {
+                result.addLast(current.data);
+            }
+            current = current.next;
+        }
+
+        return result;
     }
 
     public boolean isEmpty() {
