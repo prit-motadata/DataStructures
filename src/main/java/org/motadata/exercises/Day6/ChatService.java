@@ -7,6 +7,7 @@ import org.motadata.datastructures.linkedlist.SinglyLinkedList;
 
 import java.util.ArrayDeque;
 import java.util.Deque;
+import java.util.Objects;
 import java.util.Queue;
 
 public class ChatService {
@@ -122,7 +123,7 @@ public class ChatService {
         // Rotate through the queue once to find the first message for this user
         for (int i = 0; i < size; i++) {
             Message msg = messageQueue.poll();
-            if (target == null && msg.to().equals(username)) {
+            if (target == null && Objects.requireNonNull(msg).to().equals(username)) {
                 target = msg;
             } else {
                 messageQueue.offer(msg);
