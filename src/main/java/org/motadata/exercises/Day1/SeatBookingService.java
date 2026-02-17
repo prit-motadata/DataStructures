@@ -1,9 +1,10 @@
 package org.motadata.exercises.Day1;
 
-import org.motadata.datastructures.array.ArrayFixedSize;
-
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.ConcurrentHashMap;
+
+import org.motadata.datastructures.array.ArrayFixedSize;
 
 public class SeatBookingService {
 
@@ -11,28 +12,48 @@ public class SeatBookingService {
     private static final int BOOKED = 1;
 
     private final ArrayFixedSize<Integer> seats;
+    private final ConcurrentHashMap<Integer, Object> seatLocks = new ConcurrentHashMap<>();
 
     public SeatBookingService(int totalSeats) {
         seats = new ArrayFixedSize<>(totalSeats);
         seats.fill(EMPTY); // initialize all seats as empty
     }
 
+    // Book the first available seat (no seat number provided)
+    public boolean bookSeat() {
+        for (int seatNumber = 1; seatNumber <= seats.size(); seatNumber++) {
+            Object lock = seatLocks.computeIfAbsent(seatNumber, key -> new Object());
+            int index = seatNumber - 1;
+
+            synchronized (lock) {
+                if (seats.get(index) == EMPTY) {
+                    seats.set(index, BOOKED);
+                    return true;
+                }
+            }
+        }
+        return false; // no seats available
+    }
+
     // Book a seat by seat number (1-based)
     public boolean bookSeat(int seatNumber) {
-        int index = seatNumber - 1;
-
         if (!isValidSeatNumber(seatNumber)) {
             throw new IllegalArgumentException(
                     "Seat number must be between 1 and " + seats.size()
             );
         }
 
-        if (seats.get(index) == BOOKED) {
-            return false; // already booked
-        }
+        Object lock = seatLocks.computeIfAbsent(seatNumber, key -> new Object());
+        int index = seatNumber - 1;
 
-        seats.set(index, BOOKED);
-        return true;
+        synchronized (lock) {
+            if (seats.get(index) == BOOKED) {
+                return false; // already booked
+            }
+
+            seats.set(index, BOOKED);
+            return true;
+        }
     }
 
     // Check if a seat is available
