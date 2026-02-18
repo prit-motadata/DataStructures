@@ -2,11 +2,11 @@ package org.motadata.exercises.Day3;
 
 import org.motadata.datastructures.linkedlist.SinglyLinkedList;
 
-public class PlaylistService {
+public class PlaylistServiceSinglyLinkedList {
 
     private final SinglyLinkedList<String> playlist;
 
-    public PlaylistService() {
+    public PlaylistServiceSinglyLinkedList() {
         this.playlist = new SinglyLinkedList<>();
     }
 

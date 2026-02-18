@@ -8,13 +8,13 @@ import java.io.PrintStream;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-public class PlaylistServiceTest {
+public class PlaylistServiceSinglyLinkedListTest {
 
-    private PlaylistService playlist;
+    private PlaylistServiceSinglyLinkedList playlist;
 
     @BeforeEach
     void setUp() {
-        playlist = new PlaylistService();
+        playlist = new PlaylistServiceSinglyLinkedList();
     }
 
     @Test

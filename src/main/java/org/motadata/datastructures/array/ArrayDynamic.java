@@ -53,6 +53,16 @@ public class ArrayDynamic<T> {
         return buffer.length;
     }
 
+    public void ensureCapacity(int minCapacity) {
+        if (minCapacity > buffer.length) {
+            int newCapacity = buffer.length;
+            while (newCapacity < minCapacity) {
+                newCapacity *= 2;
+            }
+            buffer = Arrays.copyOf(buffer, newCapacity);
+        }
+    }
+
     private void checkIndex(int index) {
         if (index < 0 || index >= size) {
             throw new IndexOutOfBoundsException(
