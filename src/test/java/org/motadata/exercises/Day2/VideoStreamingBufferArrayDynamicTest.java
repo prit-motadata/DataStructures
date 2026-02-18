@@ -4,11 +4,11 @@ import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-class VideoStreamingBufferTest {
+class VideoStreamingBufferArrayDynamicTest {
 
     @Test
     void shouldUseDefaultCapacity() {
-        VideoStreamingBuffer buffer = new VideoStreamingBuffer();
+        VideoStreamingBufferArrayDynamic buffer = new VideoStreamingBufferArrayDynamic();
 
         assertEquals(0, buffer.getBufferedPacketCount());
         assertEquals(16, buffer.getBufferCapacity());
@@ -16,7 +16,7 @@ class VideoStreamingBufferTest {
 
     @Test
     void shouldAddPacketsWithoutResizeBeforeLoadFactor() {
-        VideoStreamingBuffer buffer = new VideoStreamingBuffer();
+        VideoStreamingBufferArrayDynamic buffer = new VideoStreamingBufferArrayDynamic();
 
         // Add up to load factor threshold (12)
         for (int i = 0; i < 12; i++) {
@@ -29,7 +29,7 @@ class VideoStreamingBufferTest {
 
     @Test
     void shouldResizeWhenLoadFactorIsExceeded() {
-        VideoStreamingBuffer buffer = new VideoStreamingBuffer();
+        VideoStreamingBufferArrayDynamic buffer = new VideoStreamingBufferArrayDynamic();
 
         // 13th insert triggers resize
         for (int i = 0; i < 13; i++) {
@@ -42,7 +42,7 @@ class VideoStreamingBufferTest {
 
     @Test
     void shouldPreservePacketOrderAfterResize() {
-        VideoStreamingBuffer buffer = new VideoStreamingBuffer();
+        VideoStreamingBufferArrayDynamic buffer = new VideoStreamingBufferArrayDynamic();
 
         buffer.addPacket("Frame1");
         buffer.addPacket("Frame2");
@@ -55,7 +55,7 @@ class VideoStreamingBufferTest {
 
     @Test
     void shouldThrowExceptionForInvalidIndexAccess() {
-        VideoStreamingBuffer buffer = new VideoStreamingBuffer();
+        VideoStreamingBufferArrayDynamic buffer = new VideoStreamingBufferArrayDynamic();
 
         assertThrows(
                 IndexOutOfBoundsException.class,

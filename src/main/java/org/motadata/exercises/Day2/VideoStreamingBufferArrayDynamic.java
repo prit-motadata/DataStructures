@@ -3,11 +3,11 @@ package org.motadata.exercises.Day2;
 
 import org.motadata.datastructures.array.ArrayDynamic;
 
-public class VideoStreamingBuffer {
+public class VideoStreamingBufferArrayDynamic {
 
     private final ArrayDynamic<String> buffer;
 
-    public VideoStreamingBuffer() {
+    public VideoStreamingBufferArrayDynamic() {
         this.buffer = new ArrayDynamic<>();
     }
 
