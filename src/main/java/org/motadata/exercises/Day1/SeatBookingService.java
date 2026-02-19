@@ -1,10 +1,10 @@
 package org.motadata.exercises.Day1;
 
+import org.motadata.datastructures.array.ArrayFixedSize;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
-
-import org.motadata.datastructures.array.ArrayFixedSize;
 
 public class SeatBookingService {
 
@@ -82,20 +82,22 @@ public class SeatBookingService {
 
     // Cancel a booking
     public boolean cancelSeat(int seatNumber) {
-        int index = seatNumber - 1;
 
         if (!isValidSeatNumber(seatNumber)) {
-            throw new IllegalArgumentException(
-                    "Invalid seat number"
-            );
+            throw new IllegalArgumentException("Invalid seat number");
         }
 
-        if (seats.get(index) == EMPTY) {
-            return false; // already empty
-        }
+        Object lock = seatLocks.computeIfAbsent(seatNumber, key -> new Object());
+        int index = seatNumber - 1;
 
-        seats.set(index, EMPTY);
-        return true;
+        synchronized (lock) {
+            if (seats.get(index) == EMPTY) {
+                return false;
+            }
+
+            seats.set(index, EMPTY);
+            return true;
+        }
     }
 
     // Helper validation method
