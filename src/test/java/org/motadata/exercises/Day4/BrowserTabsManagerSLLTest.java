@@ -8,13 +8,13 @@ import java.io.PrintStream;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-public class BrowserTabsManagerTest {
+public class BrowserTabsManagerSLLTest {
 
-    private BrowserTabsManager manager;
+    private BrowserTabsManagerSLL manager;
 
     @BeforeEach
     void setUp() {
-        manager = new BrowserTabsManager();
+        manager = new BrowserTabsManagerSLL();
     }
 
     @Test
@@ -22,8 +22,8 @@ public class BrowserTabsManagerTest {
         manager.openTab("Google");
         manager.openTab("YouTube");
 
-        assertTrue(manager.isTabOpen("Google"));
-        assertTrue(manager.isTabOpen("YouTube"));
+        assertTrue(manager.search("Google"));
+        assertTrue(manager.search("YouTube"));
     }
 
     @Test
@@ -33,7 +33,7 @@ public class BrowserTabsManagerTest {
         boolean closed = manager.closeTab("GitHub");
 
         assertTrue(closed);
-        assertFalse(manager.isTabOpen("GitHub"));
+        assertFalse(manager.search("GitHub"));
     }
 
     @Test
@@ -49,8 +49,8 @@ public class BrowserTabsManagerTest {
     void shouldSearchTabCorrectly() {
         manager.openTab("Docs");
 
-        assertTrue(manager.isTabOpen("Docs"));
-        assertFalse(manager.isTabOpen("Mail"));
+        assertTrue(manager.search("Docs"));
+        assertFalse(manager.search("Mail"));
     }
 
     @Test

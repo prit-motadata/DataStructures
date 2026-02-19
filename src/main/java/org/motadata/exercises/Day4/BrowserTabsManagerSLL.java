@@ -2,11 +2,11 @@ package org.motadata.exercises.Day4;
 
 import org.motadata.datastructures.linkedlist.SinglyLinkedList;
 
-public class BrowserTabsManager {
+public class BrowserTabsManagerSLL {
 
     private final SinglyLinkedList<String> tabs;
 
-    public BrowserTabsManager() {
+    public BrowserTabsManagerSLL() {
         this.tabs = new SinglyLinkedList<>();
     }
 
@@ -21,7 +21,7 @@ public class BrowserTabsManager {
     }
 
     // Search tab
-    public boolean isTabOpen(String tabName) {
+    public boolean search(String tabName) {
         return tabs.contains(tabName);
     }
 

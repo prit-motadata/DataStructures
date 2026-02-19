@@ -136,21 +136,45 @@ class MapImplementationTest {
         assertTrue(values.isEmpty());
     }
 
-    // -------- TREEIFICATION SPECIFIC (Stress Test) --------
+    @ParameterizedTest
+    @EnumSource(MapType.class)
+    void shouldRemoveMiddleNodeFromBucket(MapType type) {
+        Map<BadHashKey, String> map = MapFactory.createMap(type);
+
+        BadHashKey k1 = new BadHashKey(1);
+        BadHashKey k2 = new BadHashKey(2);
+        BadHashKey k3 = new BadHashKey(3);
+
+        // All go into same bucket
+        map.put(k1, "A");
+        map.put(k2, "B");
+        map.put(k3, "C");
+
+        assertEquals(3, map.size());
+
+        // Remove middle node (NOT head)
+        assertTrue(map.remove(k2));
+
+        assertEquals(2, map.size());
+        assertNull(map.get(k2));
+        assertEquals("A", map.get(k1));
+        assertEquals("C", map.get(k3));
+    }
 
     @ParameterizedTest
-    @EnumSource(value = MapType.class, names = "TREEIFIED")
-    void shouldHandleMultipleCollisionsAndTreeify(MapType type) {
+    @EnumSource(MapType.class)
+    void shouldHandleLargeNumberOfInsertionsAndResize(MapType type) {
         Map<Integer, String> map = MapFactory.createMap(type);
 
-        // Add enough entries to trigger treeify threshold
-        for (int i = 0; i < 20; i++) {
+        // Insert enough elements to force multiple resizes
+        for (int i = 0; i < 100; i++) {
             map.put(i, "val" + i);
         }
 
-        assertEquals(20, map.size());
+        assertEquals(100, map.size());
 
-        for (int i = 0; i < 20; i++) {
+        // Verify all elements exist
+        for (int i = 0; i < 100; i++) {
             assertEquals("val" + i, map.get(i));
         }
     }
