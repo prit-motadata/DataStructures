@@ -1,7 +1,7 @@
 package org.motadata.exercises.Day10;
 
 import org.junit.jupiter.api.Test;
-import org.motadata.common.factory.MapType;
+import org.motadata.common.factory.map.MapType;
 
 import static org.junit.jupiter.api.Assertions.*;
 

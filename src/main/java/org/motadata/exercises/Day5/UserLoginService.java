@@ -1,7 +1,7 @@
 package org.motadata.exercises.Day5;
 
-import org.motadata.common.factory.MapFactory;
-import org.motadata.common.factory.MapType;
+import org.motadata.common.factory.map.MapFactory;
+import org.motadata.common.factory.map.MapType;
 import org.motadata.datastructures.hashmap.Map;
 
 import java.util.Set;

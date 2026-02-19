@@ -3,8 +3,8 @@ package org.motadata.datastructures.hashmap;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.EnumSource;
-import org.motadata.common.factory.MapFactory;
-import org.motadata.common.factory.MapType;
+import org.motadata.common.factory.map.MapFactory;
+import org.motadata.common.factory.map.MapType;
 
 import java.util.Collection;
 import java.util.Set;

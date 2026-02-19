@@ -1,4 +1,4 @@
-package org.motadata.common.factory;
+package org.motadata.common.factory.map;
 
 public enum MapType {
     GENERIC,

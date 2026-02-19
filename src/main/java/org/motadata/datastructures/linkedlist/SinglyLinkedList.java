@@ -2,7 +2,7 @@ package org.motadata.datastructures.linkedlist;
 
 import java.util.function.Predicate;
 
-public class SinglyLinkedList<T> {
+public class SinglyLinkedList<T> implements List<T> {
 
     private Node<T> head;
     private Node<T> tail;
@@ -111,5 +111,15 @@ public class SinglyLinkedList<T> {
 
     public boolean isEmpty() {
         return head == null;
+    }
+
+    private static class Node<T> {
+        T data;
+        Node<T> next;
+
+        Node(T data) {
+            this.data = data;
+            this.next = null;
+        }
     }
 }

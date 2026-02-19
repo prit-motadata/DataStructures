@@ -1,4 +1,4 @@
-package org.motadata.common.factory;
+package org.motadata.common.factory.map;
 
 import org.motadata.datastructures.hashmap.CustomLinkedHashMap;
 import org.motadata.datastructures.hashmap.GenericBucketHashMap;
