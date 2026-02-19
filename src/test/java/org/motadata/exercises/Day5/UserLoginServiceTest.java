@@ -185,6 +185,96 @@ class UserLoginServiceTest {
         assertTrue(users.isEmpty());
     }
 
+    // -------- searchUsersByPrefix --------
+
+    @ParameterizedTest
+    @EnumSource(MapType.class)
+    void shouldReturnUsersMatchingPrefix(MapType mapType) {
+        UserLoginService loginService = createService(mapType);
+
+        loginService.registerUser("amazon", "1");
+        loginService.registerUser("amazing", "2");
+        loginService.registerUser("amber", "3");
+        loginService.registerUser("google", "4");
+
+        Set<String> result = loginService.searchUsersByPrefix("am");
+
+        assertEquals(3, result.size());
+        assertTrue(result.contains("amazon"));
+        assertTrue(result.contains("amazing"));
+        assertTrue(result.contains("amber"));
+        assertFalse(result.contains("google"));
+    }
+
+    @ParameterizedTest
+    @EnumSource(MapType.class)
+    void shouldReturnSingleMatchForPrefix(MapType mapType) {
+        UserLoginService loginService = createService(mapType);
+
+        loginService.registerUser("alice", "123");
+        loginService.registerUser("bob", "456");
+
+        Set<String> result = loginService.searchUsersByPrefix("ali");
+
+        assertEquals(1, result.size());
+        assertTrue(result.contains("alice"));
+    }
+
+    @ParameterizedTest
+    @EnumSource(MapType.class)
+    void shouldReturnEmptySetWhenNoPrefixMatches(MapType mapType) {
+        UserLoginService loginService = createService(mapType);
+
+        loginService.registerUser("alice", "123");
+
+        Set<String> result = loginService.searchUsersByPrefix("zz");
+
+        assertNotNull(result);
+        assertTrue(result.isEmpty());
+    }
+
+    @ParameterizedTest
+    @EnumSource(MapType.class)
+    void shouldReturnEmptySetWhenPrefixIsNull(MapType mapType) {
+        UserLoginService loginService = createService(mapType);
+
+        Set<String> result = loginService.searchUsersByPrefix(null);
+
+        assertNotNull(result);
+        assertTrue(result.isEmpty());
+    }
+
+    @ParameterizedTest
+    @EnumSource(MapType.class)
+    void shouldReturnAllUsersWhenPrefixIsEmpty(MapType mapType) {
+        UserLoginService loginService = createService(mapType);
+
+        loginService.registerUser("alice", "1");
+        loginService.registerUser("bob", "2");
+
+        Set<String> result = loginService.searchUsersByPrefix("");
+
+        assertEquals(2, result.size());
+        assertTrue(result.contains("alice"));
+        assertTrue(result.contains("bob"));
+    }
+
+    @ParameterizedTest
+    @EnumSource(MapType.class)
+    void deletingUserShouldRemoveItFromPrefixSearch(MapType mapType) {
+        UserLoginService loginService = createService(mapType);
+
+        loginService.registerUser("amazon", "1");
+        loginService.registerUser("amazing", "2");
+
+        loginService.deleteUser("amazon");
+
+        Set<String> result = loginService.searchUsersByPrefix("am");
+
+        assertFalse(result.contains("amazon"));
+        assertTrue(result.contains("amazing"));
+    }
+
     // ------- Default Constructor -------
 
     @Test
