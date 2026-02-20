@@ -7,6 +7,10 @@ public class Task implements Comparable<Task> {
     private final Runnable action;
 
     public Task(String id, int priority, Runnable action) {
+        if (action == null) {
+            throw new IllegalArgumentException("Action cannot be null");
+        }
+
         this.id = id;
         this.priority = priority;
         this.action = action;
