@@ -24,8 +24,12 @@ public class CartItem {
         }
     }
 
+    public void setQuantity(int quantity) {
+        this.quantity = quantity;
+    }
+
     public double totalPrice() {
-        return product.price() * quantity;
+        return product.getPrice() * quantity;
     }
 
     public int quantity() {

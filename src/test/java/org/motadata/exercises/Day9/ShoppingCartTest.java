@@ -3,137 +3,166 @@ package org.motadata.exercises.Day9;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+
 import static org.junit.jupiter.api.Assertions.*;
 
 class ShoppingCartTest {
 
     private ShoppingCart cart;
-    private Product p1;
-    private Product p2;
+    private Product product;
 
     @BeforeEach
-    void setUp() {
+    void setup() {
         cart = new ShoppingCart();
-        p1 = new Product("1", "Laptop", 1000.0);
-        p2 = new Product("2", "Mouse", 100.0);
+        product = new Product("p1", "Keyboard", 100, 100);
     }
 
-    // ---------------- CART ----------------
-
     @Test
-    void addNewItem_shouldIncreaseSize() {
-        cart.addItem(p1, 2);
-
+    void testAddAndTotal() {
+        cart.addItem(product, 2);
+        assertEquals(200, cart.getTotal());
         assertEquals(1, cart.totalItems());
-        assertEquals(2000.0, cart.calculateTotal());
     }
 
     @Test
-    void addExistingItem_shouldIncreaseQuantity() {
-        cart.addItem(p1, 1);
-        cart.addItem(p1, 2);
+    void testRemoveItem() {
+        cart.addItem(product, 2);
+        cart.removeItem(product.getId());
 
-        assertEquals(1, cart.totalItems());
-        assertEquals(3000.0, cart.calculateTotal());
-    }
-
-    @Test
-    void removeItem_shouldRemoveFromCart() {
-        cart.addItem(p1, 1);
-        cart.removeItem("1");
-
-        assertEquals(0, cart.totalItems());
-        assertEquals(0.0, cart.calculateTotal());
-    }
-
-    @Test
-    void updateQuantity_shouldUpdateCorrectly() {
-        cart.addItem(p1, 5);
-        cart.updateQuantity("1", 2);
-
-        assertEquals(2000.0, cart.calculateTotal());
-    }
-
-    @Test
-    void updateQuantity_zeroOrLess_shouldRemoveItem() {
-        cart.addItem(p1, 3);
-        cart.updateQuantity("1", 0);
-
+        assertEquals(0, cart.getTotal());
         assertEquals(0, cart.totalItems());
     }
 
     @Test
-    void updateQuantity_nonExistingItem_shouldDoNothing() {
+    void testUpdateQuantityIncrease() {
+        cart.addItem(product, 1);
+        cart.updateQuantity("p1", 5);
+
+        assertEquals(500, cart.getTotal());
+    }
+
+    @Test
+    void testUpdateQuantityDecrease() {
+        cart.addItem(product, 5);
+        cart.updateQuantity("p1", 2);
+
+        assertEquals(200, cart.getTotal());
+    }
+
+    @Test
+    void testConstructorValid() {
+        Product product = new Product("p1", "Mouse", 50, 100);
+        CartItem item = new CartItem(product, 5);
+
+        assertEquals(5, item.quantity());
+        assertEquals(product, item.product());
+    }
+
+    @Test
+    void testConstructorInvalidQuantity() {
+        Product product = new Product("p1", "Mouse", 50, 100);
+
+        assertThrows(IllegalArgumentException.class,
+                () -> new CartItem(product, 0));
+
+        assertThrows(IllegalArgumentException.class,
+                () -> new CartItem(product, -5));
+    }
+
+    @Test
+    void testIncreaseQuantity() {
+        Product product = new Product("p1", "Mouse", 50, 100);
+        CartItem item = new CartItem(product, 2);
+
+        item.increaseQuantity(3);
+
+        assertEquals(5, item.quantity());
+    }
+
+    @Test
+    void testDecreaseQuantityNormal() {
+        Product product = new Product("p1", "Mouse", 50, 100);
+        CartItem item = new CartItem(product, 5);
+
+        item.decreaseQuantity(2);
+
+        assertEquals(3, item.quantity());
+    }
+
+    @Test
+    void testDecreaseQuantityToZero() {
+        Product product = new Product("p1", "Mouse", 50, 100);
+        CartItem item = new CartItem(product, 5);
+
+        item.decreaseQuantity(10); // goes below zero branch
+
+        assertEquals(0, item.quantity());
+    }
+
+    @Test
+    void testUpdateQuantityZero() {
+        cart.addItem(product, 3);
+        cart.updateQuantity("p1", 0);
+
+        assertEquals(0, cart.getTotal());
+    }
+
+    @Test
+    void testUpdateNonExisting() {
         cart.updateQuantity("unknown", 5);
-
-        assertEquals(0, cart.totalItems());
+        assertEquals(0, cart.getTotal());
     }
 
     @Test
-    void calculateTotal_multipleItems() {
-        cart.addItem(p1, 1);
-        cart.addItem(p2, 2);
+    void testApplyDiscountValid() {
+        cart.addItem(product, 2);
 
-        assertEquals(1200.0, cart.calculateTotal());
-    }
-
-    // ---------------- DISCOUNTS ----------------
-
-    @Test
-    void applyDiscount_existingCode() {
-        cart.addItem(p1, 1);
-
-        Discount discount = new Discount("SALE10", 10);
+        Discount discount = new Discount("SAVE10", 10);
         cart.addDiscount(discount);
 
-        double total = cart.applyDiscount("SALE10");
-
-        assertEquals(900.0, total);
+        assertEquals(180, cart.applyDiscount("SAVE10"));
     }
 
     @Test
-    void applyDiscount_nonExistingCode_shouldReturnOriginalTotal() {
-        cart.addItem(p1, 1);
+    void testApplyDiscountInvalid() {
+        cart.addItem(product, 2);
 
-        double total = cart.applyDiscount("INVALID");
-
-        assertEquals(1000.0, total);
-    }
-
-    // ---------------- WISHLIST ----------------
-
-    @Test
-    void wishlist_addAndCheck() {
-        cart.addToWishlist("1");
-
-        assertTrue(cart.isInWishlist("1"));
+        assertEquals(200, cart.applyDiscount("INVALID"));
     }
 
     @Test
-    void wishlist_remove() {
-        cart.addToWishlist("1");
-        cart.removeFromWishlist("1");
+    void testWishlist() {
+        cart.addToWishlist("p1");
+        assertTrue(cart.isInWishlist("p1"));
 
-        assertFalse(cart.isInWishlist("1"));
+        cart.removeFromWishlist("p1");
+        assertFalse(cart.isInWishlist("p1"));
     }
 
     @Test
-    void wishlist_nonExistingItem() {
-        assertFalse(cart.isInWishlist("999"));
-    }
+    void testConcurrentAdd() throws Exception {
+        int threads = 10;
 
-    // ---------------- EDGE CASES ----------------
+        try (ExecutorService executor = Executors.newFixedThreadPool(threads)) {
 
-    @Test
-    void calculateTotal_emptyCart_shouldBeZero() {
-        assertEquals(0.0, cart.calculateTotal());
-    }
+            List<Callable<Void>> tasks = new ArrayList<>();
 
-    @Test
-    void applyDiscount_emptyCart_shouldBeZero() {
-        Discount discount = new Discount("SALE10", 10);
-        cart.addDiscount(discount);
+            for (int i = 0; i < threads; i++) {
+                tasks.add(() -> {
+                    cart.addItem(product, 1);
+                    return null;
+                });
+            }
 
-        assertEquals(0.0, cart.applyDiscount("SALE10"));
+            executor.invokeAll(tasks);  // waits for completion
+            executor.shutdown();
+        }
+
+        assertEquals(1000, cart.getTotal());
     }
 }

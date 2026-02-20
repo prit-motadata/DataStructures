@@ -1,49 +1,58 @@
 package org.motadata.exercises.Day9;
 
-import org.motadata.datastructures.hashmap.GenericBucketHashMap;
-import org.motadata.datastructures.hashmap.Map;
-
-import java.util.HashSet;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.atomic.AtomicReference;
 
 public class ShoppingCart {
 
-    private final Map<String, CartItem> items = new GenericBucketHashMap<>();
-    private final Map<String, Discount> discounts = new GenericBucketHashMap<>();
-    private final Set<String> wishlist = new HashSet<>();
+    private final ConcurrentHashMap<String, CartItem> items = new ConcurrentHashMap<>();
+    private final ConcurrentHashMap<String, Discount> discounts = new ConcurrentHashMap<>();
+    private final Set<String> wishlist = ConcurrentHashMap.newKeySet();
+    private final AtomicReference<Double> total = new AtomicReference<>(0.0);
 
     // ---------------- CART ----------------
 
     public void addItem(Product product, int quantity) {
-        CartItem item = items.get(product.id());
-
-        if (item == null) {
-            items.put(product.id(), new CartItem(product, quantity));
-        } else {
-            item.increaseQuantity(quantity);
-        }
+        items.compute(product.getId(), (id, existing) -> {
+            if (existing == null) {
+                total.updateAndGet(t -> t + product.getPrice() * quantity);
+                return new CartItem(product, quantity);
+            } else {
+                existing.increaseQuantity(quantity);
+                total.updateAndGet(t -> t + product.getPrice() * quantity);
+                return existing;
+            }
+        });
     }
 
     public void removeItem(String productId) {
-        items.remove(productId);
-    }
-
-    public void updateQuantity(String productId, int quantity) {
-        CartItem item = items.get(productId);
-        if (item == null) return;
-
-        if (quantity <= 0) {
-            items.remove(productId);
-        } else {
-            item.decreaseQuantity(item.quantity() - quantity);
+        CartItem removed = items.remove(productId);
+        if (removed != null) {
+            total.updateAndGet(t -> t - removed.totalPrice());
         }
     }
 
-    public double calculateTotal() {
-        return items.values()
-                .stream()
-                .mapToDouble(CartItem::totalPrice)
-                .sum();
+    public void updateQuantity(String productId, int newQuantity) {
+        items.computeIfPresent(productId, (id, item) -> {
+
+            int oldQty = item.quantity();
+            double price = item.product().getPrice();
+
+            if (newQuantity <= 0) {
+                total.updateAndGet(t -> t - (oldQty * price));
+                return null;
+            } else {
+                int diff = newQuantity - oldQty;
+                item.setQuantity(newQuantity);
+                total.updateAndGet(t -> t + (diff * price));
+                return item;
+            }
+        });
+    }
+
+    public double getTotal() {
+        return total.get();
     }
 
     // ---------------- DISCOUNTS ----------------
@@ -55,9 +64,9 @@ public class ShoppingCart {
     public double applyDiscount(String code) {
         Discount discount = discounts.get(code);
         if (discount == null) {
-            return calculateTotal();
+            return total.get();
         }
-        return discount.apply(calculateTotal());
+        return discount.apply(total.get());
     }
 
     // ---------------- WISHLIST ----------------
