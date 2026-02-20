@@ -6,6 +6,11 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 
+/**
+ * Service that manages concurrent seat bookings using a fixed-size backing array and per-seat locks.
+ *
+ * @author prit.thakkar@motadata.com
+ */
 public class SeatBookingService {
 
     private static final int EMPTY = 0;
@@ -14,12 +19,23 @@ public class SeatBookingService {
     private final ArrayFixedSize<Integer> seats;
     private final ConcurrentHashMap<Integer, Object> seatLocks = new ConcurrentHashMap<>();
 
+    /**
+     * Creates a new seat booking service with the given number of seats.
+     *
+     * @param totalSeats total number of seats that can be booked
+     */
     public SeatBookingService(int totalSeats) {
         seats = new ArrayFixedSize<>(totalSeats);
         seats.fill(EMPTY); // initialize all seats as empty
     }
 
-    // Book the first available seat (no seat number provided)
+    /**
+     * Books the first available seat.
+     *
+     * @return {@code true} if a seat was successfully booked, {@code false} if no seats were available
+     * @see #bookSeat(int)
+     * @see #getAvailableSeats()
+     */
     public boolean bookSeat() {
         for (int seatNumber = 1; seatNumber <= seats.size(); seatNumber++) {
             Object lock = seatLocks.computeIfAbsent(seatNumber, key -> new Object());
@@ -35,7 +51,14 @@ public class SeatBookingService {
         return false; // no seats available
     }
 
-    // Book a seat by seat number (1-based)
+    /**
+     * Books a specific seat by its 1-based seat number.
+     *
+     * @param seatNumber the 1-based seat number to book
+     * @return {@code true} if the seat was successfully booked, {@code false} if it was already booked
+     * @throws IllegalArgumentException if the seat number is outside the valid range
+     * @see #isSeatAvailable(int)
+     */
     public boolean bookSeat(int seatNumber) {
         if (!isValidSeatNumber(seatNumber)) {
             throw new IllegalArgumentException(
@@ -56,7 +79,13 @@ public class SeatBookingService {
         }
     }
 
-    // Check if a seat is available
+    /**
+     * Checks whether the given 1-based seat number is currently available.
+     *
+     * @param seatNumber the seat number to check
+     * @return {@code true} if the seat is available, {@code false} otherwise
+     * @throws IllegalArgumentException if the seat number is outside the valid range
+     */
     public boolean isSeatAvailable(int seatNumber) {
         int index = seatNumber - 1;
 
@@ -69,7 +98,12 @@ public class SeatBookingService {
         return seats.get(index) == EMPTY;
     }
 
-    // Get available seats
+    /**
+     * Returns a list of all currently available seat numbers.
+     *
+     * @return list of 1-based seat numbers that are available for booking
+     * @see #bookSeat()
+     */
     public List<Integer> getAvailableSeats() {
         List<Integer> result = new ArrayList<>();
         for (int i = 0; i < seats.size(); i++) {
@@ -80,7 +114,14 @@ public class SeatBookingService {
         return result;
     }
 
-    // Cancel a booking
+    /**
+     * Cancels an existing booking for the given 1-based seat number.
+     *
+     * @param seatNumber the seat number whose booking should be cancelled
+     * @return {@code true} if the booking was cancelled, {@code false} if the seat was not booked
+     * @throws IllegalArgumentException if the seat number is outside the valid range
+     * @see #bookSeat(int)
+     */
     public boolean cancelSeat(int seatNumber) {
 
         if (!isValidSeatNumber(seatNumber)) {
@@ -100,7 +141,13 @@ public class SeatBookingService {
         }
     }
 
-    // Helper validation method
+    /**
+     * Validates whether the given seat number is within the allowed range.
+     *
+     * @param seatNumber the seat number to validate
+     * @return {@code true} if the seat number is between 1 and the total number of seats (inclusive),
+     * {@code false} otherwise
+     */
     private boolean isValidSeatNumber(int seatNumber) {
         return seatNumber >= 1 && seatNumber <= seats.size();
     }
