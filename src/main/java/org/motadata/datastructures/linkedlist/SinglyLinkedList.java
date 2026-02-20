@@ -2,12 +2,23 @@ package org.motadata.datastructures.linkedlist;
 
 import java.util.function.Predicate;
 
+/**
+ * Singly linked list implementation that supports insertion, removal, search, and display operations.
+ *
+ * @param <T> element type stored in the list
+ * @author prit.thakkar@motadata.com
+ */
 public class SinglyLinkedList<T> implements List<T> {
 
     private Node<T> head;
     private Node<T> tail;
 
     // Add at beginning
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public void addFirst(T data) {
         Node<T> newNode = new Node<>(data);
 
@@ -20,6 +31,11 @@ public class SinglyLinkedList<T> implements List<T> {
     }
 
     // Add at end
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public void addLast(T data) {
         Node<T> newNode = new Node<>(data);
 
@@ -33,6 +49,11 @@ public class SinglyLinkedList<T> implements List<T> {
     }
 
     // Remove element
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public boolean remove(T data) {
         if (head == null) {
             return false;
@@ -67,6 +88,11 @@ public class SinglyLinkedList<T> implements List<T> {
     }
 
     // Search Element
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public boolean contains(T data) {
         Node<T> current = head;
         while (current != null) {
@@ -79,6 +105,11 @@ public class SinglyLinkedList<T> implements List<T> {
     }
 
     // Display list
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public void display() {
         if (head == null) {
             System.out.println("List is empty");
@@ -94,6 +125,11 @@ public class SinglyLinkedList<T> implements List<T> {
     }
 
     // Search list
+
+    /**
+        * {@inheritDoc}
+        */
+    @Override
     public SinglyLinkedList<T> search(Predicate<T> condition) {
         SinglyLinkedList<T> result = new SinglyLinkedList<>();
 
@@ -109,10 +145,19 @@ public class SinglyLinkedList<T> implements List<T> {
         return result;
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public boolean isEmpty() {
         return head == null;
     }
 
+    /**
+     * Internal node representing a single element in the list.
+     *
+     * @param <T> element type
+     */
     private static class Node<T> {
         T data;
         Node<T> next;

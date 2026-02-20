@@ -3,6 +3,15 @@ package org.motadata.datastructures.heap;
 import java.util.Arrays;
 import java.util.Comparator;
 
+/**
+ * Generic priority queue backed by a binary heap stored in an array.
+ *
+ * <p>Orders elements according to a provided {@link Comparator} or their natural ordering
+ * if no comparator is supplied.</p>
+ *
+ * @param <E> element type stored in the queue
+ * @author prit.thakkar@motadata.com
+ */
 public class PriorityQueueBinaryHeap<E> {
 
     private static final int DEFAULT_CAPACITY = 10;
@@ -13,14 +22,29 @@ public class PriorityQueueBinaryHeap<E> {
 
     // -------- Constructors --------
 
+    /**
+     * Creates an empty priority queue with default capacity and natural element ordering.
+     */
     public PriorityQueueBinaryHeap() {
         this(DEFAULT_CAPACITY, null);
     }
 
+    /**
+     * Creates an empty priority queue with default capacity and the given comparator.
+     *
+     * @param comparator comparator used to order elements, or {@code null} for natural ordering
+     */
     public PriorityQueueBinaryHeap(Comparator<? super E> comparator) {
         this(DEFAULT_CAPACITY, comparator);
     }
 
+    /**
+     * Creates an empty priority queue with the given capacity and comparator.
+     *
+     * @param capacity   initial backing array size
+     * @param comparator comparator used to order elements, or {@code null} for natural ordering
+     * @throws IllegalArgumentException if {@code capacity} is not positive
+     */
     public PriorityQueueBinaryHeap(int capacity, Comparator<? super E> comparator) {
         if (capacity <= 0) {
             throw new IllegalArgumentException("Capacity must be positive");
@@ -31,6 +55,12 @@ public class PriorityQueueBinaryHeap<E> {
 
     // -------- Public APIs --------
 
+    /**
+     * Inserts the specified element into this priority queue.
+     *
+     * @param element element to add (must not be {@code null})
+     * @throws NullPointerException if {@code element} is {@code null}
+     */
     public void offer(E element) {
         if (element == null) {
             throw new NullPointerException("Element cannot be null");
@@ -42,6 +72,12 @@ public class PriorityQueueBinaryHeap<E> {
         size++;
     }
 
+    /**
+     * Retrieves and removes the head of this queue, or returns {@code null} if the queue is empty.
+     *
+     * @return smallest element according to the comparator or natural ordering, or {@code null} if empty
+     * @see #peek()
+     */
     public E poll() {
         if (isEmpty()) {
             return null;
@@ -61,6 +97,12 @@ public class PriorityQueueBinaryHeap<E> {
         return result;
     }
 
+    /**
+     * Retrieves, but does not remove, the head of this queue, or returns {@code null} if the queue is empty.
+     *
+     * @return smallest element in the queue, or {@code null} if empty
+     * @see #poll()
+     */
     public E peek() {
         if (isEmpty()) {
             return null;
@@ -68,16 +110,31 @@ public class PriorityQueueBinaryHeap<E> {
         return elementAt(0);
     }
 
+    /**
+     * Returns the number of elements currently in the queue.
+     *
+     * @return current size
+     */
     public int size() {
         return size;
     }
 
+    /**
+     * Returns whether the queue contains no elements.
+     *
+     * @return {@code true} if the queue is empty, {@code false} otherwise
+     */
     public boolean isEmpty() {
         return size == 0;
     }
 
     // -------- Internal Logic --------
 
+    /**
+     * Restores the heap invariant by sifting an element up from the given index.
+     *
+     * @param index index of the element to sift up
+     */
     private void siftUp(int index) {
         E target = elementAt(index);
 
@@ -96,6 +153,11 @@ public class PriorityQueueBinaryHeap<E> {
         elements[index] = target;
     }
 
+    /**
+     * Restores the heap invariant by sifting an element down from the given index.
+     *
+     * @param index index of the element to sift down
+     */
     private void siftDown(int index) {
         E target = elementAt(index);
 
@@ -125,6 +187,13 @@ public class PriorityQueueBinaryHeap<E> {
         elements[index] = target;
     }
 
+    /**
+     * Compares two elements using the configured comparator or their natural ordering.
+     *
+     * @param e1 first element
+     * @param e2 second element
+     * @return negative if {@code e1 < e2}, zero if equal, positive if {@code e1 > e2}
+     */
     @SuppressWarnings("unchecked")
     private int compare(E e1, E e2) {
         if (comparator != null) {
@@ -133,6 +202,9 @@ public class PriorityQueueBinaryHeap<E> {
         return ((Comparable<? super E>) e1).compareTo(e2);
     }
 
+    /**
+     * Ensures there is room to insert at least one more element, resizing the backing array if necessary.
+     */
     private void ensureCapacity() {
         if (size >= elements.length) {
             int newCapacity = elements.length * 2;
@@ -140,6 +212,12 @@ public class PriorityQueueBinaryHeap<E> {
         }
     }
 
+    /**
+     * Returns the element at the given index in the backing array.
+     *
+     * @param index index in the backing array
+     * @return element at the specified index
+     */
     @SuppressWarnings("unchecked")
     private E elementAt(int index) {
         return (E) elements[index];

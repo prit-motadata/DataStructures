@@ -2,8 +2,24 @@ package org.motadata.datastructures.trie;
 
 import java.util.*;
 
+/**
+ * A Radix Tree (also known as a compact trie) implementation for efficient
+ * string storage and retrieval.
+ *
+ * <p>
+ * Unlike a standard Trie, nodes with only one child are merged with their
+ * parents,
+ * saving space and improving lookup performance by reducing the number of nodes
+ * visited.
+ * </p>
+ *
+ * @author prit.thakkar@motadata.com
+ */
 public class RadixTree {
 
+    /**
+     * Internal node representing a prefix or word in the Radix Tree.
+     */
     private static class Node {
         Map<String, Node> children = new HashMap<>();
         boolean isEnd;
@@ -13,6 +29,16 @@ public class RadixTree {
 
     // ---------------- INSERT ----------------
 
+    /**
+     * Inserts a word into the Radix Tree.
+     *
+     * <p>
+     * If the word already exists, no changes are made. If it shares a common prefix
+     * with an existing edge, the edge is split accordingly.
+     * </p>
+     *
+     * @param word the word to be inserted
+     */
     public void insert(String word) {
         insert(root, word);
     }
@@ -23,7 +49,8 @@ public class RadixTree {
 
             int commonPrefixLength = commonPrefix(edge, word);
 
-            if (commonPrefixLength == 0) continue;
+            if (commonPrefixLength == 0)
+                continue;
 
             // Case 1: Edge fully matches
             if (commonPrefixLength == edge.length()) {
@@ -62,6 +89,13 @@ public class RadixTree {
 
     // ---------------- SEARCH ----------------
 
+    /**
+     * Searches for a word in the Radix Tree.
+     *
+     * @param word the word to search for
+     * @return {@code true} if the word exists and is marked as an end node,
+     *         {@code false} otherwise
+     */
     public boolean search(String word) {
         return search(root, word);
     }
@@ -85,6 +119,12 @@ public class RadixTree {
 
     // ---------------- PREFIX SEARCH ----------------
 
+    /**
+     * Retrieves all words in the tree that start with the given prefix.
+     *
+     * @param prefix the prefix to search for
+     * @return a set of all words matching the prefix
+     */
     public Set<String> searchByPrefix(String prefix) {
         Set<String> result = new HashSet<>();
         searchPrefix(root, prefix, "", result);
@@ -92,9 +132,9 @@ public class RadixTree {
     }
 
     private void searchPrefix(Node current,
-                              String prefix,
-                              String path,
-                              Set<String> result) {
+            String prefix,
+            String path,
+            Set<String> result) {
 
         for (Map.Entry<String, Node> entry : current.children.entrySet()) {
             String edge = entry.getKey();
@@ -104,16 +144,15 @@ public class RadixTree {
 
             if (combined.startsWith(prefix)) {
                 collectAll(child, combined, result);
-            }
-            else if (prefix.startsWith(combined)) {
+            } else if (prefix.startsWith(combined)) {
                 searchPrefix(child, prefix, combined, result);
             }
         }
     }
 
     private void collectAll(Node node,
-                            String path,
-                            Set<String> result) {
+            String path,
+            Set<String> result) {
 
         if (node.isEnd) {
             result.add(path);
@@ -128,6 +167,13 @@ public class RadixTree {
 
     // ---------------- DELETE (Optional basic version) ----------------
 
+    /**
+     * Removes a word from the Radix Tree if it exists.
+     *
+     * @param word the word to be deleted
+     * @return {@code true} if the word was found and removed, {@code false}
+     *         otherwise
+     */
     public boolean delete(String word) {
         return delete(root, word);
     }
@@ -142,7 +188,8 @@ public class RadixTree {
                 String remaining = word.substring(edge.length());
 
                 if (remaining.isEmpty()) {
-                    if (!child.isEnd) return false;
+                    if (!child.isEnd)
+                        return false;
                     child.isEnd = false;
 
                     if (child.children.isEmpty()) {
@@ -161,6 +208,13 @@ public class RadixTree {
 
     // ---------------- Utility ----------------
 
+    /**
+     * Calculates the length of the common prefix between two strings.
+     *
+     * @param s1 first string
+     * @param s2 second string
+     * @return length of the shared prefix
+     */
     private int commonPrefix(String s1, String s2) {
         int len = Math.min(s1.length(), s2.length());
         int i = 0;

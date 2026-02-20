@@ -2,12 +2,23 @@ package org.motadata.datastructures.linkedlist;
 
 import java.util.function.Predicate;
 
+/**
+ * Doubly linked list implementation that supports bidirectional traversal and position-based insertion.
+ *
+ * @param <T> element type stored in the list
+ * @author prit.thakkar@motadata.com
+ */
 public class DoublyLinkedList<T> implements BidirectionalList<T> {
 
     private Node<T> head;
     private Node<T> tail;
     private int size;
 
+    /**
+     * Node representing an element in the doubly linked list with references to neighbors.
+     *
+     * @param <T> element type
+     */
     private static class Node<T> {
         T data;
         Node<T> next;
@@ -19,6 +30,11 @@ public class DoublyLinkedList<T> implements BidirectionalList<T> {
     }
 
     // Add at beginning
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public void addFirst(T data) {
         Node<T> newNode = new Node<>(data);
 
@@ -33,6 +49,11 @@ public class DoublyLinkedList<T> implements BidirectionalList<T> {
     }
 
     // Add at end
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public void addLast(T data) {
         Node<T> newNode = new Node<>(data);
 
@@ -47,6 +68,11 @@ public class DoublyLinkedList<T> implements BidirectionalList<T> {
     }
 
     // Remove element
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public boolean remove(T data) {
         if (head == null) return false;
 
@@ -92,6 +118,11 @@ public class DoublyLinkedList<T> implements BidirectionalList<T> {
     }
 
     // Search element
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public boolean contains(T data) {
         Node<T> current = head;
 
@@ -105,6 +136,11 @@ public class DoublyLinkedList<T> implements BidirectionalList<T> {
     }
 
     // Display forward
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public void display() {
         if (head == null) {
             System.out.println("List is empty");
@@ -122,6 +158,11 @@ public class DoublyLinkedList<T> implements BidirectionalList<T> {
     }
 
     // Display reverse (advantage of doubly list)
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public void displayReverse() {
         if (tail == null) {
             System.out.println("List is empty");
@@ -138,6 +179,9 @@ public class DoublyLinkedList<T> implements BidirectionalList<T> {
         System.out.println("START");
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public DoublyLinkedList<T> search(Predicate<T> condition) {
         DoublyLinkedList<T> result = new DoublyLinkedList<>();
@@ -154,15 +198,29 @@ public class DoublyLinkedList<T> implements BidirectionalList<T> {
         return result;
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public boolean isEmpty() {
         return size == 0;
     }
 
+    /**
+     * Returns the number of elements currently stored in this list.
+     *
+     * @return list size
+     */
     public int size() {
         return size;
     }
 
     // Add before a given existing value
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public boolean addBefore(T existing, T newData) {
         if (head == null) return false;
 
@@ -195,6 +253,11 @@ public class DoublyLinkedList<T> implements BidirectionalList<T> {
     }
 
     // Add after a given existing value
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public boolean addAfter(T existing, T newData) {
         if (head == null) return false;
 

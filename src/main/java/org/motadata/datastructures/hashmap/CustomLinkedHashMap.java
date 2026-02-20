@@ -2,6 +2,15 @@ package org.motadata.datastructures.hashmap;
 
 import java.util.*;
 
+/**
+ * Hash map implementation that maintains insertion or access order using a linked list of entries.
+ *
+ * <p>The iteration order is either by insertion (default) or by access when {@code accessOrder} is enabled.</p>
+ *
+ * @param <K> key type
+ * @param <V> value type
+ * @author prit.thakkar@motadata.com
+ */
 public class CustomLinkedHashMap<K, V> extends Map<K, V> implements Iterable<K> {
 
     private static final int DEFAULT_CAPACITY = 16;
@@ -16,10 +25,19 @@ public class CustomLinkedHashMap<K, V> extends Map<K, V> implements Iterable<K> 
 
     private final boolean accessOrder;
 
+    /**
+     * Creates a new map with default capacity, insertion-order iteration.
+     */
     public CustomLinkedHashMap() {
         this(DEFAULT_CAPACITY, false);
     }
 
+    /**
+     * Creates a new map with the given capacity and ordering mode.
+     *
+     * @param capacity    initial bucket capacity
+     * @param accessOrder {@code true} for access-order iteration, {@code false} for insertion-order
+     */
     @SuppressWarnings("unchecked")
     public CustomLinkedHashMap(int capacity, boolean accessOrder) {
         this.table = new Node[capacity];
@@ -29,6 +47,13 @@ public class CustomLinkedHashMap<K, V> extends Map<K, V> implements Iterable<K> 
 
     // -------- PUT --------
 
+    /**
+     * Associates the specified value with the given key and appends the entry to the linked order list.
+     *
+     * @param key   non-null key
+     * @param value non-null value
+     * @return {@code true} if a new key was added, {@code false} if an existing key was updated
+     */
     @Override
     public boolean put(K key, V value) {
         if (key == null || value == null) {
@@ -63,6 +88,12 @@ public class CustomLinkedHashMap<K, V> extends Map<K, V> implements Iterable<K> 
 
     // -------- GET --------
 
+    /**
+     * Returns the value for the specified key and optionally moves the entry to the end if access order is enabled.
+     *
+     * @param key key whose associated value is to be returned
+     * @return mapped value or {@code null} if none
+     */
     @Override
     public V get(K key) {
         Node<K, V> node = getNode(key);
@@ -77,6 +108,12 @@ public class CustomLinkedHashMap<K, V> extends Map<K, V> implements Iterable<K> 
 
     // -------- REMOVE --------
 
+    /**
+     * Removes the mapping for the given key, updating both the bucket chain and the linked order list.
+     *
+     * @param key key whose mapping is to be removed
+     * @return {@code true} if an entry was removed, {@code false} otherwise
+     */
     @Override
     public boolean remove(K key) {
         int index = hash(key, table.length);
@@ -105,11 +142,21 @@ public class CustomLinkedHashMap<K, V> extends Map<K, V> implements Iterable<K> 
         return false;
     }
 
+    /**
+     * Returns the number of key-value mappings stored in this map.
+     *
+     * @return current size
+     */
     @Override
     public int size() {
         return size;
     }
 
+    /**
+     * Returns keys in their current iteration order.
+     *
+     * @return ordered set of keys
+     */
     @Override
     public Set<K> keySet() {
         Set<K> keys = new LinkedHashSet<>();
@@ -123,6 +170,11 @@ public class CustomLinkedHashMap<K, V> extends Map<K, V> implements Iterable<K> 
         return keys;
     }
 
+    /**
+     * Returns values in the same order as {@link #keySet()} iteration.
+     *
+     * @return ordered collection of values
+     */
     @Override
     public Collection<V> values() {
         List<V> values = new ArrayList<>();
@@ -138,6 +190,12 @@ public class CustomLinkedHashMap<K, V> extends Map<K, V> implements Iterable<K> 
 
     // -------- Internal --------
 
+    /**
+     * Locates the node corresponding to the given key in the bucket chain.
+     *
+     * @param key key to search for
+     * @return matching node or {@code null} if not found
+     */
     private Node<K, V> getNode(K key) {
         int index = hash(key, table.length);
 
@@ -153,6 +211,11 @@ public class CustomLinkedHashMap<K, V> extends Map<K, V> implements Iterable<K> 
         return null;
     }
 
+    /**
+     * Appends the given node to the end of the doubly-linked iteration list.
+     *
+     * @param node node to link
+     */
     private void linkLast(Node<K, V> node) {
         if (tail == null) {
             head = tail = node;
@@ -163,6 +226,11 @@ public class CustomLinkedHashMap<K, V> extends Map<K, V> implements Iterable<K> 
         }
     }
 
+    /**
+     * Removes the given node from the doubly-linked iteration list.
+     *
+     * @param node node to unlink
+     */
     private void unlink(Node<K, V> node) {
         Node<K, V> before = node.before;
         Node<K, V> after = node.after;
@@ -182,6 +250,11 @@ public class CustomLinkedHashMap<K, V> extends Map<K, V> implements Iterable<K> 
         node.before = node.after = null;
     }
 
+    /**
+     * Moves an existing node to the end of the doubly-linked iteration list.
+     *
+     * @param node node to move
+     */
     private void moveToEnd(Node<K, V> node) {
         if (node == tail) return;
 
@@ -189,6 +262,9 @@ public class CustomLinkedHashMap<K, V> extends Map<K, V> implements Iterable<K> 
         linkLast(node);
     }
 
+    /**
+     * Doubles the bucket table size and rehashes all nodes while preserving iteration order.
+     */
     @SuppressWarnings("unchecked")
     private void resize() {
         Node<K, V>[] oldTable = table;
@@ -207,6 +283,11 @@ public class CustomLinkedHashMap<K, V> extends Map<K, V> implements Iterable<K> 
 
     // -------- Iterator --------
 
+    /**
+     * Returns an iterator over keys in their iteration order.
+     *
+     * @return iterator over keys
+     */
     @Override
     public Iterator<K> iterator() {
         return new Iterator<>() {
@@ -229,6 +310,12 @@ public class CustomLinkedHashMap<K, V> extends Map<K, V> implements Iterable<K> 
         };
     }
 
+    /**
+     * Internal node used for both bucket chains and the iteration linked list.
+     *
+     * @param <K> key type
+     * @param <V> value type
+     */
     private static class Node<K, V> {
         final K key;
         V value;
