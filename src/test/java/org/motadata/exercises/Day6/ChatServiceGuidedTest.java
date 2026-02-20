@@ -2,16 +2,22 @@ package org.motadata.exercises.Day6;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.motadata.exercises.Day6.guided.ChatService;
+import org.motadata.exercises.Day6.guided.Message;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-class ChatServiceTest {
+class ChatServiceGuidedTest {
 
     private ChatService chatService;
+    private java.io.ByteArrayOutputStream outContent;
 
     @BeforeEach
     void setUp() {
         chatService = new ChatService();
+
+        outContent = new java.io.ByteArrayOutputStream();
+        System.setOut(new java.io.PrintStream(outContent));
     }
 
     // ---------------- REGISTER ----------------
@@ -173,5 +179,73 @@ class ChatServiceTest {
 
         // Just ensure no exception and history path executed
         chatService.displayMessageHistory();
+    }
+
+    @Test
+    void searchMessages_nullKeyword_printsInvalid() {
+        chatService.searchMessages(null);
+
+        String output = outContent.toString().trim();
+        assertTrue(output.contains("Invalid keyword"));
+    }
+
+    @Test
+    void searchMessages_emptyKeyword_printsInvalid() {
+        chatService.searchMessages("   ");
+
+        String output = outContent.toString().trim();
+        assertTrue(output.contains("Invalid keyword"));
+    }
+
+    @Test
+    void searchMessages_noMatch_printsNoMessagesFound() {
+        chatService.register("a", "1");
+        chatService.register("b", "2");
+        chatService.login("a", "1");
+
+        chatService.sendMessage("a", "b", "Hello World");
+        chatService.receiveMessage("b");
+
+        chatService.searchMessages("xyz");
+
+        String output = outContent.toString();
+        assertTrue(output.contains("Search Results for: xyz"));
+        assertTrue(output.contains("No messages found."));
+    }
+
+    @Test
+    void searchMessages_shouldDisplayMatchingMessages() {
+        chatService.register("a", "1");
+        chatService.register("b", "2");
+        chatService.login("a", "1");
+
+        chatService.sendMessage("a", "b", "Hello Java");
+        chatService.sendMessage("a", "b", "Spring Boot Rocks");
+
+        chatService.receiveMessage("b");
+        chatService.receiveMessage("b");
+
+        chatService.searchMessages("java");
+
+        String output = outContent.toString().toLowerCase();
+
+        assertTrue(output.contains("search results for: java"));
+        assertTrue(output.contains("hello java"));
+        assertFalse(output.contains("spring boot rocks"));
+    }
+
+    @Test
+    void searchMessages_shouldBeCaseInsensitive() {
+        chatService.register("a", "1");
+        chatService.register("b", "2");
+        chatService.login("a", "1");
+
+        chatService.sendMessage("a", "b", "HELLO WORLD");
+        chatService.receiveMessage("b");
+
+        chatService.searchMessages("hello");
+
+        String output = outContent.toString().toLowerCase();
+        assertTrue(output.contains("hello world"));
     }
 }

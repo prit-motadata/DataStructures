@@ -1,4 +1,4 @@
-package org.motadata.exercises.Day6;
+package org.motadata.exercises.Day6.guided;
 
 import org.motadata.datastructures.array.ArrayDynamic;
 import org.motadata.datastructures.hashmap.GenericBucketHashMap;

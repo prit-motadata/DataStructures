@@ -1,4 +1,4 @@
-package org.motadata.exercises.Day6;
+package org.motadata.exercises.Day6.guided;
 
 public enum UserStatus {
     OFFLINE,
