@@ -6,11 +6,6 @@ import org.motadata.common.factory.map.MapType;
 import static org.junit.jupiter.api.Assertions.*;
 
 class UrlShortenerServiceTest {
-
-    // =============================
-    // CONSTRUCTORS
-    // =============================
-
     @Test
     void testDefaultConstructor() {
         UrlShortenerService service = new UrlShortenerService();
@@ -24,10 +19,6 @@ class UrlShortenerServiceTest {
 
         assertEquals(0, service.totalUrls());
     }
-
-    // =============================
-    // SHORTEN URL
-    // =============================
 
     @Test
     void testShortenUrlSuccess() {
@@ -47,10 +38,6 @@ class UrlShortenerServiceTest {
         assertThrows(NullPointerException.class,
                 () -> service.shortenUrl(null));
     }
-
-    // =============================
-    // GET ORIGINAL URL
-    // =============================
 
     @Test
     void testGetOriginalUrlSuccess() {
@@ -83,10 +70,6 @@ class UrlShortenerServiceTest {
         String fakeUrl = "https://short.ly/unknown";
         assertNull(service.getOriginalUrl(fakeUrl));
     }
-
-    // =============================
-    // TOTAL URL COUNT
-    // =============================
 
     @Test
     void testTotalUrlsAfterMultipleInsertions() {

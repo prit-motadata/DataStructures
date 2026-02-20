@@ -1,34 +1,27 @@
 package org.motadata.exercises.Day10;
 
-import org.motadata.common.factory.map.MapFactory;
-import org.motadata.common.factory.map.MapType;
-import org.motadata.datastructures.hashmap.Map;
-
 import java.util.Objects;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
 
-public class UrlShortenerService {
-
+public class UrlShortenerServiceConcurrent {
     private static final String BASE_URL = "https://short.ly/";
 
-    // shortCode -> originalUrl
-    private final Map<String, String> urlStore;
+    // Thread-safe map
+    private final ConcurrentMap<String, String> urlStore =
+            new ConcurrentHashMap<>();
 
     private final UrlGenerator generator = new UrlGenerator();
-
-    public UrlShortenerService(MapType type) {
-        this.urlStore = MapFactory.createMap(type);
-    }
-
-    public UrlShortenerService() {
-        this.urlStore = MapFactory.createDefault();
-    }
 
     public String shortenUrl(String originalUrl) {
         Objects.requireNonNull(originalUrl, "URL cannot be null");
 
-        String shortCode = generator.generate();
+        String shortCode;
 
-        urlStore.put(shortCode, originalUrl);
+        // Collision-safe under concurrency
+        do {
+            shortCode = generator.generate();
+        } while (urlStore.putIfAbsent(shortCode, originalUrl) != null);
 
         return BASE_URL + shortCode;
     }
@@ -39,7 +32,6 @@ public class UrlShortenerService {
         }
 
         String shortCode = shortUrl.substring(BASE_URL.length());
-
         return urlStore.get(shortCode);
     }
 
